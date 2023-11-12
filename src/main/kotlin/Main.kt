@@ -42,13 +42,11 @@ fun main() {
                 require(locationList.isNotEmpty()) {
                     bot.sendMessage(chatId = chatId, text = "No zone added, please add a zone first.")
                 }
-                val stringBuilder = StringBuilder()
-                locationList.forEach { location ->
-                    val formattedString = "${location.zoneId} > ${location.displayName}"
-                    stringBuilder.append(formattedString).append("\n")
+                val text = locationList.joinToString("\n") { location ->
+                    "${location.zoneId} > ${location.displayName}"
                 }
 
-                bot.sendMessage(chatId = chatId, text = stringBuilder.toString())
+                bot.sendMessage(chatId = chatId, text = text)
             }
 
             command("delete") {
@@ -81,16 +79,13 @@ fun main() {
                 require(locationList.isNotEmpty()) {
                     bot.sendMessage(chatId = chatId, text = "No zone added, please add a zone first.")
                 }
-                val stringBuilder = StringBuilder()
-                locationList.forEach { location ->
-                    val formattedMessage = "${location.displayName} > ${
-                        LocalDateTime.now(ZoneId.of(location.zoneId)).format(
-                            DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
-                        )
+                val text = locationList.joinToString("\n") { location ->
+                    "${location.displayName} > ${
+                        LocalDateTime.now(ZoneId.of(location.zoneId))
+                            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
                     }"
-                    stringBuilder.append(formattedMessage).append("\n")
                 }
-                bot.sendMessage(chatId = chatId, text = stringBuilder.toString())
+                bot.sendMessage(chatId = chatId, text = text)
             }
 
 

@@ -1,5 +1,4 @@
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
@@ -13,7 +12,7 @@ import java.sql.Connection
 data class Location(
     val displayName: String,
     val zoneId: String,
-    val chatId: Long
+    val chatId: Long,
 )
 
 object Locations : IntIdTable() {
@@ -24,8 +23,7 @@ object Locations : IntIdTable() {
 
 object DatabaseFactory {
     fun init() {
-        val currentPath = System.getProperty("user.dir")
-        val dbPath = "$currentPath/wisul.db"
+        val dbPath = "./wisul.db"
         if (!File(dbPath).exists()) {
             File(dbPath).createNewFile()
         }
@@ -45,9 +43,8 @@ object DatabaseFactory {
 interface DAOFacade {
     suspend fun addLocation(zoneId: String, chatId: Long): Location?
     suspend fun allLocation(chatId: Long): List<Location>
-    suspend fun deleteLocation(zoneId: String,chatId: Long): Boolean
-
-    suspend fun deleteDuplicates(chatId: Long):Boolean
+    suspend fun deleteLocation(zoneId: String, chatId: Long): Boolean
+    suspend fun deleteDuplicates(chatId: Long): Boolean
 }
 
 val dao: DAOFacade = DAOFacadeImpl()
