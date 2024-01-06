@@ -29,6 +29,9 @@ fun main() {
                     require(zoneId in ZoneId.getAvailableZoneIds()) {
                         bot.sendMessage(chatId = chatId, text = "Invalid zone id: $zoneId")
                     }
+                    require(zoneId !in dao.allLocation(chatId.id).map(Location::zoneId)) {
+                        bot.sendMessage(chatId = chatId, text = "Zone has been added!")
+                    }
                     val location = dao.addLocation(zoneId, ChatId.fromId(message.chat.id).id)
                     require(location != null) {
                         bot.sendMessage(chatId = chatId, text = "Unable to add zone: $zoneId")
