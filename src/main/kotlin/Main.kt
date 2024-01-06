@@ -3,10 +3,11 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.handlers.CommandHandlerEnvironment
 import com.github.kotlintelegrambot.entities.ChatId
-import java.time.LocalDateTime
+import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.concurrent.schedule
 
 fun main() {
     DatabaseFactory.init()
@@ -16,7 +17,7 @@ fun main() {
             command("listall") {
                 bot.sendMessage(
                     chatId = ChatId.fromId(message.chat.id),
-                    text = "All available zone id can be found in:\n https://paste.ubuntu.com/p/BWPyHDPrDv/"
+                    text = "All available zone id can be found in:\n https://gist.github.com/NanamiNakano/daef64a6a3534347f8b6ee3d10dddd0b"
                 )
             }
 
@@ -25,7 +26,7 @@ fun main() {
                 val userId = message.from!!.id
                 checkPermission(chatId, userId)
                 args.forEach { zoneId ->
-                    require(zoneId in TimeZone.getAvailableIDs()) {
+                    require(zoneId in ZoneId.getAvailableZoneIds()) {
                         bot.sendMessage(chatId = chatId, text = "Invalid zone id: $zoneId")
                     }
                     val location = dao.addLocation(zoneId, ChatId.fromId(message.chat.id).id)
@@ -54,7 +55,7 @@ fun main() {
                 val userId = message.from!!.id
                 checkPermission(chatId, userId)
                 args.forEach { zoneId ->
-                    require(zoneId in TimeZone.getAvailableIDs()) {
+                    require(zoneId in ZoneId.getAvailableZoneIds()) {
                         bot.sendMessage(chatId = chatId, text = "Invalid zone id: $zoneId")
                     }
                     val success = dao.deleteLocation(zoneId, chatId.id)
@@ -79,13 +80,17 @@ fun main() {
                 require(locationList.isNotEmpty()) {
                     bot.sendMessage(chatId = chatId, text = "No zone added, please add a zone first.")
                 }
+                val now = Instant.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
                 val text = locationList.joinToString("\n") { location ->
-                    "${location.displayName} > ${
-                        LocalDateTime.now(ZoneId.of(location.zoneId))
-                            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
-                    }"
+                    "${location.displayName} > ${now.atZone(ZoneId.of(location.zoneId)).format(formatter)}"
                 }
-                bot.sendMessage(chatId = chatId, text = text)
+                val sent = bot.sendMessage(chatId = chatId, text = text).getOrNull()
+
+                Timer().schedule(10000) {
+                    bot.deleteMessage(chatId, message.messageId)
+                    sent?.messageId?.let { bot.deleteMessage(chatId, it) }
+                }
             }
 
 

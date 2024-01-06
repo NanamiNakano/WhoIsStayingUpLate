@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.22"
     application
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
@@ -25,6 +25,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.44.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.44.1")
     implementation("org.xerial:sqlite-jdbc:3.43.2.2")
+    implementation(kotlin("reflect"))
 }
 
 tasks.test {
