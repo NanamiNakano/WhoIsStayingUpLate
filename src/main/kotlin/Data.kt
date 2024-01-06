@@ -23,7 +23,8 @@ object Locations : IntIdTable() {
 
 object DatabaseFactory {
     fun init() {
-        val dbPath = "./wisul.db"
+        val parent:String? = System.getenv("DB_PATH")
+        val dbPath = "${parent ?: "."}/wisul.db"
         if (!File(dbPath).exists()) {
             File(dbPath).createNewFile()
         }
