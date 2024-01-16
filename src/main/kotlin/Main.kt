@@ -29,9 +29,6 @@ fun main() {
                     require(zoneId in ZoneId.getAvailableZoneIds()) {
                         bot.sendMessage(chatId = chatId, text = "Invalid zone id: $zoneId")
                     }
-                    require(zoneId !in dao.allLocation(chatId.id).map(Location::zoneId)) {
-                        bot.sendMessage(chatId = chatId, text = "Zone has been added!")
-                    }
                     val location = dao.addLocation(zoneId, ChatId.fromId(message.chat.id).id)
                     require(location != null) {
                         bot.sendMessage(chatId = chatId, text = "Unable to add zone: $zoneId")
@@ -96,7 +93,37 @@ fun main() {
                 }
             }
 
+            command("alias") {
+                val chatId = ChatId.fromId(message.chat.id)
+                require(args.size == 2) {
+                    bot.sendMessage(chatId = chatId, text = "Invalid args, usage: /alias <id> <alias>. use /listid to get location ids.")
+                }
+                val id = args.first().safeToInt()
+                require(id != null) {
+                    bot.sendMessage(chatId = chatId, text = "Invalid id.")
+                }
+                require(dao.setDisplayName(id, args[1])) {
+                    bot.sendMessage(chatId = chatId, text = "Unable to set new display name.")
+                }
+                bot.sendMessage(chatId = chatId, text = "Successful to set new display name: ${args[1]}")
+            }
 
+            command("listid") {
+                val chatId = ChatId.fromId(message.chat.id)
+                val locationMap = dao.allId(chatId.id)
+                require(locationMap.isNotEmpty()) {
+                    bot.sendMessage(chatId = chatId, text = "No zone added, please add a zone first.")
+                }
+                val text = locationMap.entries.joinToString("\n") {
+                    "${it.key}: ${it.value}"
+                }
+                val sent = bot.sendMessage(chatId = chatId, text = text).getOrNull()
+
+                Timer().schedule(10000) {
+                    bot.deleteMessage(chatId, message.messageId)
+                    sent?.messageId?.let { bot.deleteMessage(chatId, it) }
+                }
+            }
         }
     }
     bot.startPolling()
@@ -123,5 +150,13 @@ fun CommandHandlerEnvironment.checkPermission(chatId: ChatId, userId: Long) {
     if (message.chat.type == "group" || message.chat.type == "supergroup") {
         checkAdminRight(chatId)
         checkAdmin(chatId, userId)
+    }
+}
+
+fun String.safeToInt():Int? {
+    return try {
+        this.toInt()
+    } catch (e:NumberFormatException) {
+        null
     }
 }

@@ -46,6 +46,8 @@ interface DAOFacade {
     suspend fun allLocation(chatId: Long): List<Location>
     suspend fun deleteLocation(zoneId: String, chatId: Long): Boolean
     suspend fun deleteDuplicates(chatId: Long): Boolean
+    suspend fun setDisplayName(id: Int,newDisplayName:String):Boolean
+    suspend fun allId(chatId: Long):Map<Int,String>
 }
 
 val dao: DAOFacade = DAOFacadeImpl()

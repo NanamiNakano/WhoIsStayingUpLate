@@ -9,7 +9,7 @@ class DAOFacadeImpl : DAOFacade {
     private fun resultRowToLocation(row: ResultRow) = Location(
         displayName = row[Locations.displayName],
         zoneId = row[Locations.zoneId],
-        chatId = row[Locations.chatId]
+        chatId = row[Locations.chatId],
     )
 
     override suspend fun addLocation(zoneId: String, chatId: Long) = dbQuery {
@@ -43,5 +43,22 @@ class DAOFacadeImpl : DAOFacade {
             operations += operation
         }
         return operations > 0
+    }
+
+    override suspend fun setDisplayName(id: Int, newDisplayName: String): Boolean {
+        return dbQuery {
+            val updates = Locations.update({ Locations.id eq id }) {
+                it[displayName] = newDisplayName
+            }
+            updates == 1
+        }
+    }
+
+    override suspend fun allId(chatId: Long): Map<Int, String> {
+        return dbQuery {
+            Locations.select { Locations.chatId eq chatId }.associate {
+                it[Locations.id].value to it[Locations.zoneId]
+            }
+        }
     }
 }
