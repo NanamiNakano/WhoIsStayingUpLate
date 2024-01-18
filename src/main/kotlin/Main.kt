@@ -98,6 +98,8 @@ fun main() {
                 require(args.size == 2) {
                     bot.sendMessage(chatId = chatId, text = "Invalid args, usage: /alias <id> <alias>. use /listid to get location ids.")
                 }
+                val userId = message.from!!.id
+                checkPermission(chatId, userId)
                 val id = args.first().safeToInt()
                 require(id != null) {
                     bot.sendMessage(chatId = chatId, text = "Invalid id.")
@@ -110,12 +112,12 @@ fun main() {
 
             command("listid") {
                 val chatId = ChatId.fromId(message.chat.id)
-                val locationMap = dao.allId(chatId.id)
-                require(locationMap.isNotEmpty()) {
+                val locationList = dao.allLocation(chatId.id)
+                require(locationList.isNotEmpty()) {
                     bot.sendMessage(chatId = chatId, text = "No zone added, please add a zone first.")
                 }
-                val text = locationMap.entries.joinToString("\n") {
-                    "${it.key}: ${it.value}"
+                val text = locationList.joinToString("\n") {
+                    "${it.id}: ${it.zoneId}"
                 }
                 val sent = bot.sendMessage(chatId = chatId, text = text).getOrNull()
 

@@ -10,6 +10,7 @@ class DAOFacadeImpl : DAOFacade {
         displayName = row[Locations.displayName],
         zoneId = row[Locations.zoneId],
         chatId = row[Locations.chatId],
+        id = row[Locations.id].value
     )
 
     override suspend fun addLocation(zoneId: String, chatId: Long) = dbQuery {
@@ -51,14 +52,6 @@ class DAOFacadeImpl : DAOFacade {
                 it[displayName] = newDisplayName
             }
             updates == 1
-        }
-    }
-
-    override suspend fun allId(chatId: Long): Map<Int, String> {
-        return dbQuery {
-            Locations.select { Locations.chatId eq chatId }.associate {
-                it[Locations.id].value to it[Locations.zoneId]
-            }
         }
     }
 }

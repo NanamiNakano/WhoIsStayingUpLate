@@ -10,6 +10,7 @@ import java.io.File
 import java.sql.Connection
 
 data class Location(
+    val id:Int,
     val displayName: String,
     val zoneId: String,
     val chatId: Long,
@@ -47,7 +48,6 @@ interface DAOFacade {
     suspend fun deleteLocation(zoneId: String, chatId: Long): Boolean
     suspend fun deleteDuplicates(chatId: Long): Boolean
     suspend fun setDisplayName(id: Int,newDisplayName:String):Boolean
-    suspend fun allId(chatId: Long):Map<Int,String>
 }
 
 val dao: DAOFacade = DAOFacadeImpl()
