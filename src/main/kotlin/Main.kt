@@ -87,7 +87,7 @@ fun main() {
                 }
                 val sent = bot.sendMessage(chatId = chatId, text = text).getOrNull()
 
-                Timer().schedule(10000) {
+                Timer().schedule(30000) {
                     bot.deleteMessage(chatId, message.messageId)
                     sent?.messageId?.let { bot.deleteMessage(chatId, it) }
                 }
@@ -121,7 +121,7 @@ fun main() {
                 }
                 val sent = bot.sendMessage(chatId = chatId, text = text).getOrNull()
 
-                Timer().schedule(10000) {
+                Timer().schedule(20000) {
                     bot.deleteMessage(chatId, message.messageId)
                     sent?.messageId?.let { bot.deleteMessage(chatId, it) }
                 }
