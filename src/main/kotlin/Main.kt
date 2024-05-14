@@ -81,7 +81,7 @@ fun main() {
                     bot.sendMessage(chatId = chatId, text = "No zone added, please add a zone first.")
                 }
                 val now = Instant.now()
-                val formatter = DateTimeFormatter.ofPattern("EEE yyyy/MM/dd HH:mm:ss")
+                val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss EEE")
                 val text = locationList.joinToString("\n") { location ->
                     "${location.displayName} > ${now.atZone(ZoneId.of(location.zoneId)).format(formatter)}"
                 }
